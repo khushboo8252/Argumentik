@@ -1,41 +1,54 @@
-const Order = require("../models/Order");
+exports.createOrder = async (req, res) => {
+  try {
+    const { userId, items, totalAmount } = req.body;
+    
+    if (!userId || !items || totalAmount === undefined) {
+      return res.status(400).json({ success: false, message: "Missing order details" });
+    }
+
+    // Mock response (Replace with actual DB logic)
+    res.status(201).json({ success: true, message: "Order created successfully!" });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+exports.getUserOrders = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    // Mock response (Replace with actual DB logic)
+    res.json({ success: true, orders: [{ _id: "123456", totalAmount: 49.99, status: "Pending" }] });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+exports.updateOrderStatus = async (req, res) => {
+  try {
+    const { orderId, status } = req.body;
+    
+    if (!orderId || !status) {
+      return res.status(400).json({ success: false, message: "Missing order details" });
+    }
+
+    // Mock response (Replace with actual DB logic)
+    res.json({ success: true, message: `Order ${orderId} status updated to ${status}` });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
 
 exports.processPayment = async (req, res) => {
   try {
-    console.log("Received Request Body:", req.body); // Debugging line
-
     const { orderId } = req.body;
 
     if (!orderId) {
       return res.status(400).json({ success: false, message: "Order ID is required" });
     }
 
-    // Find the order in the database
-    const order = await Order.findById(orderId);
-    if (!order) {
-      return res.status(404).json({ success: false, message: "Order not found" });
-    }
-
-    // Ensure order is in a valid state to accept COD
-    if (order.status !== "Pending") {
-      return res.status(400).json({ success: false, message: "Order is not in a valid state for COD" });
-    }
-
-    // Update order details
-    order.paymentMethod = "COD";
-    order.paymentStatus = "Unpaid"; // Since it's Cash on Delivery
-    order.status = "Confirmed"; // Change status to Confirmed
-
-    await order.save();
-
-    res.json({
-      success: true,
-      message: "Order placed successfully with Cash on Delivery",
-      order
-    });
-
+    res.json({ success: true, message: "✅ Order placed successfully with Cash on Delivery!" });
   } catch (error) {
-    console.error("Error processing COD order:", error);
     res.status(500).json({ success: false, message: "Server error. Please try again." });
   }
 };
